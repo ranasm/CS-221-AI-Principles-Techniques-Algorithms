@@ -1,0 +1,254 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "StanfordCS221Lecture1.ipynb",
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "YEr-hVOR6UJt"
+      },
+      "source": [
+        "#Lecture 1\n",
+        "'''\n",
+        "Compute the minimum edit distance between two strings. \n",
+        "Apply insertion/deletion/substitution (cost = 1 for all actions)\n",
+        "\n",
+        "GOAL of this code is to introduce to the concept of DISCRETE optimization\n",
+        "\n",
+        "Example \n",
+        "s: 'a cat'\n",
+        "t: 'the cats!'\n",
+        "'''\n",
+        "\n",
+        "#Dynammic Programming approach\n",
+        "#Note: Dynammic programming is essentially recursion and memoization\n",
+        "def ComputeEditDistance(s,t):\n",
+        "  cache={} #memoize\n",
+        "  def Recurse(m,n):\n",
+        "    if (m,n) in cache:\n",
+        "      return cache[(m,n)]\n",
+        "    if m==0:\n",
+        "      return n\n",
+        "    elif n==0:\n",
+        "      return m\n",
+        "    #Last characters are equal\n",
+        "    elif s[m-1]==t[n-1]:\n",
+        "      return Recurse(m-1,n-1)\n",
+        "    #Last characters are different\n",
+        "    else:\n",
+        "      subsitution=1+Recurse(m-1,n-1)\n",
+        "      insertion=1+Recurse(m,n-1)  #Insertion to s is equivalent of deleting from t\n",
+        "      deletion=1+Recurse(m-1,n)\n",
+        "      result=min(subsitution,insertion,deletion)\n",
+        "      cache[(m,n)]=result\n",
+        "      return result\n",
+        "\n",
+        "  return (Recurse(len(s),len(t)))"
+      ],
+      "execution_count": 4,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sflUxRcQCFbP",
+        "outputId": "b764531a-a978-4845-9476-e1c8b2ff8038"
+      },
+      "source": [
+        "ComputeEditDistance('a cat!','the cats!')"
+      ],
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "4"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "QfirYrYtCKlu",
+        "outputId": "94763a36-ec59-4e8c-af4a-1c26de1a3c86"
+      },
+      "source": [
+        "'''\n",
+        "For a few simple training examples, find line of best fit using Gradient Descent\n",
+        "The goal of this code is to introduce to the concept of CONTINUOUS optimization\n",
+        "\n",
+        "REPEAT until convergence: Calculate Loss -> Calculate Gradient - > Reupdate weight vector \n",
+        "'''\n",
+        "\n",
+        "data=[(2,4),(4,2)]\n",
+        "\n",
+        "#Create Loss Function\n",
+        "def LossFunction(w):\n",
+        "  return sum((w*x-y)**2 for x,y in data)\n",
+        "\n",
+        "#Create Gradient\n",
+        "#Note: Always know what you are taking the gradient with respect to\n",
+        "def Gradient(w):\n",
+        "  return (sum(2*(w*x-y)*x for x,y in data))\n",
+        "\n",
+        "#Initialize weight vector\n",
+        "w=0\n",
+        "alpha=.01\n",
+        "for t in range(100): #For a certain amount of iterations\n",
+        "  currentLoss=LossFunction(w)\n",
+        "  gradient=Gradient(w)\n",
+        "  w=w-alpha*gradient\n",
+        "  #Update weight using gradient\n",
+        "  print('Iteration = {}, Loss ={}, Weight = {}'.format(t,currentLoss,w))\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n"
+      ],
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Iteration = 0, Loss =20, Weight = 0.32\n",
+            "Iteration = 1, Loss =11.807999999999998, Weight = 0.512\n",
+            "Iteration = 2, Loss =8.858880000000001, Weight = 0.6272\n",
+            "Iteration = 3, Loss =7.7971968, Weight = 0.69632\n",
+            "Iteration = 4, Loss =7.4149908479999995, Weight = 0.737792\n",
+            "Iteration = 5, Loss =7.27739670528, Weight = 0.7626752\n",
+            "Iteration = 6, Loss =7.227862813900801, Weight = 0.77760512\n",
+            "Iteration = 7, Loss =7.210030613004288, Weight = 0.786563072\n",
+            "Iteration = 8, Loss =7.203611020681545, Weight = 0.7919378432\n",
+            "Iteration = 9, Loss =7.201299967445356, Weight = 0.79516270592\n",
+            "Iteration = 10, Loss =7.200467988280327, Weight = 0.797097623552\n",
+            "Iteration = 11, Loss =7.200168475780918, Weight = 0.7982585741311999\n",
+            "Iteration = 12, Loss =7.200060651281129, Weight = 0.79895514447872\n",
+            "Iteration = 13, Loss =7.200021834461207, Weight = 0.799373086687232\n",
+            "Iteration = 14, Loss =7.200007860406035, Weight = 0.7996238520123392\n",
+            "Iteration = 15, Loss =7.200002829746172, Weight = 0.7997743112074035\n",
+            "Iteration = 16, Loss =7.200001018708621, Weight = 0.799864586724442\n",
+            "Iteration = 17, Loss =7.200000366735104, Weight = 0.7999187520346652\n",
+            "Iteration = 18, Loss =7.2000001320246385, Weight = 0.7999512512207991\n",
+            "Iteration = 19, Loss =7.200000047528869, Weight = 0.7999707507324795\n",
+            "Iteration = 20, Loss =7.200000017110394, Weight = 0.7999824504394877\n",
+            "Iteration = 21, Loss =7.200000006159741, Weight = 0.7999894702636926\n",
+            "Iteration = 22, Loss =7.200000002217507, Weight = 0.7999936821582155\n",
+            "Iteration = 23, Loss =7.200000000798303, Weight = 0.7999962092949293\n",
+            "Iteration = 24, Loss =7.200000000287389, Weight = 0.7999977255769576\n",
+            "Iteration = 25, Loss =7.200000000103461, Weight = 0.7999986353461745\n",
+            "Iteration = 26, Loss =7.200000000037246, Weight = 0.7999991812077047\n",
+            "Iteration = 27, Loss =7.200000000013408, Weight = 0.7999995087246229\n",
+            "Iteration = 28, Loss =7.2000000000048265, Weight = 0.7999997052347737\n",
+            "Iteration = 29, Loss =7.200000000001737, Weight = 0.7999998231408643\n",
+            "Iteration = 30, Loss =7.2000000000006255, Weight = 0.7999998938845185\n",
+            "Iteration = 31, Loss =7.200000000000226, Weight = 0.7999999363307111\n",
+            "Iteration = 32, Loss =7.200000000000081, Weight = 0.7999999617984267\n",
+            "Iteration = 33, Loss =7.200000000000029, Weight = 0.799999977079056\n",
+            "Iteration = 34, Loss =7.20000000000001, Weight = 0.7999999862474336\n",
+            "Iteration = 35, Loss =7.200000000000004, Weight = 0.7999999917484601\n",
+            "Iteration = 36, Loss =7.200000000000001, Weight = 0.799999995049076\n",
+            "Iteration = 37, Loss =7.199999999999999, Weight = 0.7999999970294456\n",
+            "Iteration = 38, Loss =7.2, Weight = 0.7999999982176673\n",
+            "Iteration = 39, Loss =7.2, Weight = 0.7999999989306004\n",
+            "Iteration = 40, Loss =7.2, Weight = 0.7999999993583602\n",
+            "Iteration = 41, Loss =7.199999999999999, Weight = 0.7999999996150161\n",
+            "Iteration = 42, Loss =7.199999999999999, Weight = 0.7999999997690097\n",
+            "Iteration = 43, Loss =7.2, Weight = 0.7999999998614058\n",
+            "Iteration = 44, Loss =7.2, Weight = 0.7999999999168435\n",
+            "Iteration = 45, Loss =7.199999999999999, Weight = 0.7999999999501061\n",
+            "Iteration = 46, Loss =7.200000000000001, Weight = 0.7999999999700637\n",
+            "Iteration = 47, Loss =7.199999999999999, Weight = 0.7999999999820382\n",
+            "Iteration = 48, Loss =7.2, Weight = 0.7999999999892229\n",
+            "Iteration = 49, Loss =7.2, Weight = 0.7999999999935338\n",
+            "Iteration = 50, Loss =7.199999999999999, Weight = 0.7999999999961203\n",
+            "Iteration = 51, Loss =7.2, Weight = 0.7999999999976721\n",
+            "Iteration = 52, Loss =7.199999999999999, Weight = 0.7999999999986033\n",
+            "Iteration = 53, Loss =7.200000000000001, Weight = 0.7999999999991619\n",
+            "Iteration = 54, Loss =7.200000000000001, Weight = 0.7999999999994972\n",
+            "Iteration = 55, Loss =7.200000000000001, Weight = 0.7999999999996984\n",
+            "Iteration = 56, Loss =7.200000000000001, Weight = 0.7999999999998191\n",
+            "Iteration = 57, Loss =7.2, Weight = 0.7999999999998915\n",
+            "Iteration = 58, Loss =7.199999999999999, Weight = 0.7999999999999349\n",
+            "Iteration = 59, Loss =7.199999999999999, Weight = 0.799999999999961\n",
+            "Iteration = 60, Loss =7.2, Weight = 0.7999999999999766\n",
+            "Iteration = 61, Loss =7.199999999999999, Weight = 0.799999999999986\n",
+            "Iteration = 62, Loss =7.199999999999999, Weight = 0.7999999999999916\n",
+            "Iteration = 63, Loss =7.2, Weight = 0.7999999999999949\n",
+            "Iteration = 64, Loss =7.2, Weight = 0.7999999999999969\n",
+            "Iteration = 65, Loss =7.199999999999999, Weight = 0.7999999999999982\n",
+            "Iteration = 66, Loss =7.200000000000001, Weight = 0.7999999999999989\n",
+            "Iteration = 67, Loss =7.2, Weight = 0.7999999999999994\n",
+            "Iteration = 68, Loss =7.2, Weight = 0.7999999999999996\n",
+            "Iteration = 69, Loss =7.2, Weight = 0.7999999999999997\n",
+            "Iteration = 70, Loss =7.199999999999999, Weight = 0.7999999999999998\n",
+            "Iteration = 71, Loss =7.2, Weight = 0.7999999999999999\n",
+            "Iteration = 72, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 73, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 74, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 75, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 76, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 77, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 78, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 79, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 80, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 81, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 82, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 83, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 84, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 85, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 86, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 87, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 88, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 89, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 90, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 91, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 92, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 93, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 94, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 95, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 96, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 97, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 98, Loss =7.200000000000001, Weight = 0.7999999999999999\n",
+            "Iteration = 99, Loss =7.200000000000001, Weight = 0.7999999999999999\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "PGf-374MDNA7"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
